@@ -498,7 +498,7 @@ public sealed class GitUICommands : IGitUICommands
         }
     }
 
-    /// <summary>Launches a new Git Extensions Avalonia process.</summary>
+    /// <summary>Launches a new Git Extensions process.</summary>
     public static IProcess Launch(string arguments, string workingDir = "")
         => new Executable(Application.ExecutablePath, workingDir).Start(arguments);
     public bool DoActionOnRepo(Func<bool> action)

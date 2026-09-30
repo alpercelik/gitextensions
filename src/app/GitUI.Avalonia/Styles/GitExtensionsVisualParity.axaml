@@ -1156,8 +1156,8 @@
       </ControlTemplate>
     </Setter>
   </Style>
-  <Style Selector="TextBlock.gitextensions-toolbar-label">
-    <Setter Property="VerticalAlignment" Value="Center" />
+  <Style Selector="Label.gitextensions-toolbar-label">
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Margin" Value="3,0,1,0" />
   </Style>
   <Style Selector="RadioButton.gitextensions-icon-radio-button">

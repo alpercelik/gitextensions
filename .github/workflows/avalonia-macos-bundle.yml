@@ -1,0 +1,43 @@
+name: Avalonia macOS bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Apple Silicon app and ZIP
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.0.2
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build bundle
+        run: bash eng/avalonia/build-macos-app.sh
+
+      - name: Check packaging and archive round trip
+        run: bash eng/avalonia/test-macos-package.sh "artifacts/macos/osx-arm64/Git Extensions Avalonia.app"
+
+      - name: Test startup and view construction
+        run: >-
+          dotnet test tests/app/UnitTests/GitUI.Avalonia.Tests/GitUI.Avalonia.Tests.csproj
+          -c Release -p:BuildAvalonia=true -m:1
+          --filter "Category=P0_8B|Category=P0_6|FullyQualifiedName~PluginDiscoveryTests"
+
+      - name: Upload app archive
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: GitExtensions-Avalonia-osx-arm64-${{ github.run_number }}-${{ github.sha }}
+          path: artifacts/macos/osx-arm64/*.app.zip
+          if-no-files-found: error
+          retention-days: 14

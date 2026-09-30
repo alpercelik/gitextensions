@@ -451,10 +451,10 @@
                 Content="»"
                 ToolTip.Tip="More toolbar commands" />
       </Grid>
-      <Grid x:Name="toolStripFiltersHost" ColumnDefinitions="*,16" Height="27" ClipToBounds="True">
+      <Grid x:Name="toolStripFiltersHost" ColumnDefinitions="*,16" Height="25" ClipToBounds="True">
         <ScrollViewer x:Name="toolStripFiltersViewport"
                       Grid.Column="0"
-                      Height="27"
+                      Height="25"
                       HorizontalScrollBarVisibility="Hidden"
                       VerticalScrollBarVisibility="Disabled">
           <controls:FilterToolBar x:Name="ToolStripFilters" />

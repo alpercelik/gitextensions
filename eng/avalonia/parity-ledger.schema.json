@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gitextensions.github.io/schemas/avalonia-parity-ledger-v1.json",
-  "title": "Git Extensions Avalonia parity ledger",
+  "title": "Git Extensions parity ledger",
   "description": "One six-axis proof entry per portmap source-to-twin mapping.",
   "type": "object",
   "additionalProperties": false,

@@ -38,3 +38,19 @@ Apple Silicon, the supported macOS architecture, keeping evidence below
    smoke.
 
 # parity-scaffolding: this checklist is retained only until automated macOS parity gates replace it.
+
+## App bundle acceptance
+
+Use `bash eng/avalonia/build-macos-app.sh` on Apple Silicon with macOS 15 or later,
+then run `bash eng/avalonia/test-macos-package.sh "artifacts/macos/osx-arm64/Git Extensions Avalonia.app"`.
+The packaging checks inspect metadata, all icon representations, the native executables,
+the self-contained runtime, the 17 plugin DLLs, and ZIP extraction. They also exercise
+invalid inputs and preservation of existing output after failure.
+
+For the runtime check, copy the bundle to a temporary directory and use isolated settings.
+Launch it using `open -n "<temporary bundle>" --args browse "/absolute/throwaway/repository"`.
+Confirm the Git Extensions icon in Finder and the Dock, repository history, loaded Plugins
+menu, and native process-group helper. Close that instance, move the temporary bundle to a
+path containing spaces, and repeat the launch. Record packaging checks, runtime observations,
+and any unverified interactions separately. Keep test settings and diagnostics out of the
+shipped bundle. These local builds are not Developer ID signed or notarized.

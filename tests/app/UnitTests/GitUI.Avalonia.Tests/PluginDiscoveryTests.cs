@@ -149,6 +149,56 @@ public sealed class PluginDiscoveryTests
             .And.Contain("Flatpak");
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Managed_extensibility_should_load_plugins_by_file_path_and_ignore_invalid_assemblies(bool validAssembly)
+    {
+        string directory = Path.Join(Path.GetTempPath(), $"Git Extensions plugin {Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string path = Path.Join(directory, "plugin.dll");
+            if (validAssembly)
+            {
+                File.Copy(typeof(ManagedExtensibility).Assembly.Location, path);
+            }
+            else
+            {
+                File.WriteAllText(path, "not a managed assembly");
+            }
+
+            MethodInfo method = typeof(ManagedExtensibility).GetMethod(
+                "TryLoadAssembly", BindingFlags.NonPublic | BindingFlags.Static)!;
+            Assembly? assembly = (Assembly?)method.Invoke(null, [new FileInfo(path)]);
+
+            if (validAssembly)
+            {
+                ((object?)assembly).Should().BeSameAs(typeof(ManagedExtensibility).Assembly);
+            }
+            else
+            {
+                assembly.Should().BeNull();
+            }
+        }
+        finally
+        {
+            TestDirectory.Delete(directory);
+        }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Managed_extensibility_should_load_a_resolved_dependency_from_its_file_path(bool useSharedDirectory)
+    {
+        Assembly expected = typeof(ManagedExtensibility).Assembly;
+        MethodInfo method = typeof(ManagedExtensibility).GetMethod(
+            "CurrentDomain_AssemblyResolve", BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        Assembly? resolved = (Assembly?)method.Invoke(null, [null, new ResolveEventArgs(expected.FullName!, useSharedDirectory ? typeof(object).Assembly : expected)]);
+
+        ((object?)resolved).Should().BeSameAs(expected);
+    }
+
     private static string? FindAssemblyPath(string directory, AssemblyName requestedAssembly)
     {
         MethodInfo method = typeof(ManagedExtensibility).GetMethod(

@@ -289,7 +289,7 @@ public sealed class VisualParityTests
                 FilterToolBar toolStripFilters = form.FindControl<FilterToolBar>("ToolStripFilters")!;
                 toolPanel.Bounds.Should().Be(new Rect(0, 27, 923, 546));
                 form.toolStripMainHost.Bounds.Should().Be(new Rect(7, 0, 812, 25));
-                form.toolStripFiltersHost.Bounds.Should().Be(new Rect(819, 0, 50, 27));
+                form.toolStripFiltersHost.Bounds.Should().Be(new Rect(819, 0, 50, 25));
                 form.toolStripFiltersOverflow.IsVisible.Should().BeTrue();
                 StackPanel filterItems = (StackPanel)toolStripFilters.Content!;
                 filterItems.Opacity.Should().Be(0);

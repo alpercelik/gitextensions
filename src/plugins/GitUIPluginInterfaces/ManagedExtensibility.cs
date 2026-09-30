@@ -94,26 +94,26 @@ public static class ManagedExtensibility
         }
 
         return exportProviderFactory.CreateExportProvider();
+    }
 
-        static Assembly? TryLoadAssembly(FileInfo file)
+    private static Assembly? TryLoadAssembly(FileInfo file)
+    {
+        try
         {
-            try
-            {
-                Assembly assembly = Assembly.Load(file.FullName);
+            Assembly assembly = Assembly.LoadFrom(file.FullName);
 
-                // Eagerly validate that all types in the assembly can be resolved.
-                // Outdated plugins targeting an incompatible interface version succeed
-                // at load time but throw ReflectionTypeLoadException here when any
-                // referenced type cannot be found in the currently loaded dependencies.
-                _ = assembly.GetTypes();
+            // Eagerly validate that all types in the assembly can be resolved.
+            // Outdated plugins targeting an incompatible interface version succeed
+            // at load time but throw ReflectionTypeLoadException here when any
+            // referenced type cannot be found in the currently loaded dependencies.
+            _ = assembly.GetTypes();
 
-                return assembly;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to load plugin {file.FullName}: {ex}");
-                return null;
-            }
+            return assembly;
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to load plugin {file.FullName}: {ex}");
+            return null;
         }
     }
 
@@ -184,8 +184,12 @@ public static class ManagedExtensibility
             }
 
             _isResolvingAssembly = true;
-            string? dll = FindAssemblyPath(fullName, new AssemblyName(args.Name));
-            return dll is null ? null : Assembly.Load(dll);
+            AssemblyName requestedAssembly = new(args.Name);
+
+            // Published portable plugins share dependencies in the application's base directory.
+            string? dll = FindAssemblyPath(fullName, requestedAssembly)
+                ?? FindAssemblyPath(AppContext.BaseDirectory, requestedAssembly);
+            return dll is null ? null : Assembly.LoadFrom(dll);
         }
         catch
         {

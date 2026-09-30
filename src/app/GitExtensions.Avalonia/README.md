@@ -1,4 +1,4 @@
-# Git Extensions Avalonia
+# Git Extensions
 
 A cross-platform user interface for Git Extensions built with [Avalonia](https://avaloniaui.net/).
 It runs on Windows, Linux, and macOS from a single code base and coexists with the classic
@@ -67,7 +67,7 @@ unconfined toolkit dialog or invoke `xdg-open` directly.
 - A desktop environment:
   - Windows 10 or later
   - Linux with an X11 or Wayland session (standard desktop distributions work out of the box)
-  - macOS 11 or later on Apple Silicon
+  - macOS 15 or later on Apple Silicon
 
 ## Building
 
@@ -143,6 +143,48 @@ Windows Forms application additionally requires the submodules
 ```
 dotnet run --project src/app/GitExtensions.Avalonia -- browse /path/to/repository
 ```
+
+### Building a macOS app bundle
+
+On an Apple Silicon Mac with macOS 15 or later, install the .NET 10 SDK,
+PowerShell (`pwsh`), Git, and Xcode Command Line Tools. Initialize the repository's
+submodules with `git submodule update --init --recursive`, then run:
+
+```sh
+bash eng/avalonia/build-macos-app.sh
+```
+
+This builds a self-contained Release app including the .NET runtime and all 17 portable
+plugins. It creates `artifacts/macos/osx-arm64/Git Extensions Avalonia.app` and the matching
+`.app.zip`. Git must still be installed on the machine running the app.
+
+Open the app in Finder, or pass an absolute repository path from Terminal:
+
+```sh
+open -n "artifacts/macos/osx-arm64/Git Extensions Avalonia.app" --args browse "/absolute/repository/path"
+```
+
+The bundle supplies the Git Extensions icon in Finder and the Dock. `dotnet run` still
+launches the executable without this bundle metadata. Output and numeric versions can be
+specified explicitly (one to three decimal components, with `0.0.0` as the local default):
+
+```sh
+bash eng/avalonia/build-macos-app.sh --output-directory "/path/to/output" \
+  --bundle-version 1.0.0 --display-version 1.0.0
+bash eng/avalonia/test-macos-package.sh "/path/to/output/Git Extensions Avalonia.app"
+```
+
+The **Avalonia macOS bundle** GitHub Actions workflow can also be triggered manually in a
+fork. Select the branch containing the workflow and download its ZIP artifact after the run.
+It does not publish a GitHub release. These are developer builds without Developer ID
+signing or notarization; downloaded builds may require explicit Gatekeeper approval.
+The minimum macOS version follows [.NET 10's supported operating systems](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
+
+Packaging follows [Avalonia's manual deployment layout](https://docs.avaloniaui.net/docs/deployment/macos)
+and [Apple's bundle conventions](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html).
+The .NET publish payload remains together under `Contents/MacOS` for runtime/plugin
+resolution. Developer ID distribution, notarization, and App Store packaging require a
+separate signing and distribution workflow.
 
 ### Maintainer testing builds
 
