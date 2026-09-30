@@ -39,8 +39,8 @@ for file in GitExtensions.Avalonia.dll GitExtensions.Avalonia.deps.json GitExten
         exit 1
     fi
 done
-lipo -verify_arch arm64 "$publish_directory/GitExtensions.Avalonia"
-lipo -verify_arch arm64 "$publish_directory/GitExtensions.ProcessGroupLauncher"
+lipo "$publish_directory/GitExtensions.Avalonia" -verify_arch arm64
+lipo "$publish_directory/GitExtensions.ProcessGroupLauncher" -verify_arch arm64
 
 if [[ "$output_archive" != *.zip || -L "$output_archive" || ( -e "$output_archive" && ! -f "$output_archive" ) ]]; then
     echo "error: output archive must be a regular, non-symlink .zip file path" >&2

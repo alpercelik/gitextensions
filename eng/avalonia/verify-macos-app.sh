@@ -12,7 +12,7 @@ for pair in 'CFBundleExecutable:GitExtensions.Avalonia' 'CFBundleIdentifier:com.
 done
 for executable in GitExtensions.Avalonia GitExtensions.ProcessGroupLauncher; do
     [[ -x "$contents/MacOS/$executable" ]] || { echo "error: missing executable $executable" >&2; exit 1; }
-    lipo -verify_arch arm64 "$contents/MacOS/$executable"
+    lipo "$contents/MacOS/$executable" -verify_arch arm64
 done
 for file in GitExtensions.Avalonia.dll GitExtensions.Avalonia.runtimeconfig.json GitExtensions.Avalonia.deps.json libhostfxr.dylib libcoreclr.dylib libAvaloniaNative.dylib; do
     [[ -s "$contents/MacOS/$file" ]] || { echo "error: missing $file" >&2; exit 1; }
